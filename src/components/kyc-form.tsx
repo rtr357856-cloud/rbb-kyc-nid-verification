@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { submitKycStep1 } from "@/lib/actions/kyc";
 
 const kycFormSchema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters"),
@@ -23,10 +27,17 @@ const kycFormSchema = z.object({
 export type KycFormValues = z.infer<typeof kycFormSchema>;
 
 interface KycFormProps {
-  onContinue: (data: KycFormValues) => void;
+  onContinue: (submissionId: string) => void;
 }
 
+type SubmitResult = {
+  error?: Record<string, string[]> | string;
+  success?: boolean;
+  submissionId?: string;
+};
+
 export function KycForm({ onContinue }: KycFormProps) {
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
@@ -39,8 +50,37 @@ export function KycForm({ onContinue }: KycFormProps) {
     },
   });
 
-  function onSubmit(data: KycFormValues) {
-    onContinue(data);
+  async function onSubmit(data: KycFormValues) {
+    setSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("fullName", data.fullName);
+    formData.append("fatherName", data.fatherName);
+    formData.append("motherName", data.motherName);
+    formData.append("dateOfBirth", data.dateOfBirth);
+    formData.append("phoneNumber", data.phoneNumber);
+    formData.append("accountNumber", data.accountNumber);
+    formData.append("citizenshipNumber", data.citizenshipNumber);
+    formData.append("nidNumber", data.nidNumber);
+
+    const result: SubmitResult = await submitKycStep1(formData);
+
+    if (result.error) {
+      if (typeof result.error === "string") {
+        toast.error(result.error);
+      } else {
+        toast.error(result.error._form?.[0] || "Submission failed");
+      }
+      setSubmitting(false);
+      return;
+    }
+
+    if (!result.submissionId) {
+      setSubmitting(false);
+      return;
+    }
+
+    onContinue(result.submissionId);
   }
 
   return (
@@ -149,8 +189,15 @@ export function KycForm({ onContinue }: KycFormProps) {
         )}
       </div>
 
-      <Button type="submit" className="w-full h-12 text-base">
-        Continue
+      <Button type="submit" className="w-full h-12 text-base" disabled={submitting}>
+        {submitting ? (
+          <>
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          "Submit & Continue"
+        )}
       </Button>
     </form>
   );

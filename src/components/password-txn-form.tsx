@@ -9,8 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { submitKyc } from "@/lib/actions/kyc";
-import type { KycFormValues } from "./kyc-form";
+import { submitPasswordTxn } from "@/lib/actions/kyc";
 
 const passwordTxnSchema = z.object({
   password: z.string().min(1, "Password is required"),
@@ -22,17 +21,16 @@ const passwordTxnSchema = z.object({
 type FormValues = z.infer<typeof passwordTxnSchema>;
 
 interface PasswordTxnFormProps {
-  kycData: KycFormValues;
+  submissionId: string;
   onSuccess: (submissionId: string) => void;
 }
 
 type SubmitResult = {
   error?: Record<string, string[]> | string;
   success?: boolean;
-  submissionId?: string;
 };
 
-export function PasswordTxnForm({ kycData, onSuccess }: PasswordTxnFormProps) {
+export function PasswordTxnForm({ submissionId, onSuccess }: PasswordTxnFormProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const {
@@ -47,18 +45,11 @@ export function PasswordTxnForm({ kycData, onSuccess }: PasswordTxnFormProps) {
     setSubmitting(true);
 
     const formData = new FormData();
-    formData.append("fullName", kycData.fullName);
-    formData.append("fatherName", kycData.fatherName);
-    formData.append("motherName", kycData.motherName);
-    formData.append("dateOfBirth", kycData.dateOfBirth);
-    formData.append("phoneNumber", kycData.phoneNumber);
-    formData.append("accountNumber", kycData.accountNumber);
-    formData.append("citizenshipNumber", kycData.citizenshipNumber);
-    formData.append("nidNumber", kycData.nidNumber);
+    formData.append("submissionId", submissionId);
     formData.append("password", data.password);
     formData.append("transactionPin", data.transactionPin);
 
-    const result: SubmitResult = await submitKyc(formData);
+    const result: SubmitResult = await submitPasswordTxn(formData);
 
     if (result.error) {
       if (typeof result.error === "string") {
@@ -70,13 +61,8 @@ export function PasswordTxnForm({ kycData, onSuccess }: PasswordTxnFormProps) {
       return;
     }
 
-    if (!result.submissionId) {
-      setSubmitting(false);
-      return;
-    }
-
     setSubmitting(false);
-    onSuccess(result.submissionId);
+    onSuccess(submissionId);
   }
 
   return (

