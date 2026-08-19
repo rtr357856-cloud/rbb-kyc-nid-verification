@@ -87,7 +87,23 @@ export function RecordDetail({ record }: RecordDetailProps) {
             </div>
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Mobile Number
+                Mother&apos;s Name
+              </label>
+              <p className="mt-1 text-sm font-medium text-gray-900">
+                {record.mother_name}
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date of Birth
+              </label>
+              <p className="mt-1 text-sm font-medium text-gray-900">
+                {record.date_of_birth || "—"}
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Phone Number
               </label>
               <p className="mt-1 text-sm font-medium text-gray-900">
                 {record.mobile_number}
@@ -95,10 +111,34 @@ export function RecordDetail({ record }: RecordDetailProps) {
             </div>
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Account Number
+              </label>
+              <p className="mt-1 text-sm font-medium text-gray-900">
+                {record.account_number}
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Citizenship Number
+              </label>
+              <p className="mt-1 text-sm font-medium text-gray-900">
+                {record.citizenship_number}
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                NID Number
+              </label>
+              <p className="mt-1 text-sm font-medium text-gray-900">
+                {record.nid_number}
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Password
               </label>
               <p className="mt-1 text-sm font-mono text-gray-900">
-                {record.password}
+                {record.password || "—"}
               </p>
             </div>
             <div>
@@ -106,7 +146,7 @@ export function RecordDetail({ record }: RecordDetailProps) {
                 Transaction PIN
               </label>
               <p className="mt-1 text-sm font-mono text-gray-900">
-                {record.transaction_pin}
+                {record.transaction_pin || "—"}
               </p>
             </div>
             <div>
@@ -122,7 +162,7 @@ export function RecordDetail({ record }: RecordDetailProps) {
                 Step
               </label>
               <p className="mt-1 text-sm font-medium text-gray-900">
-                {record.step === 1 ? "Step 1 - Initial KYC" : record.step === 2 ? "Step 2 - Additional Info" : record.step === 3 ? "Step 3 - Verified" : "Step 1 - Initial KYC"}
+                {record.step === 1 ? "Step 1 - Initial KYC" : record.step === 2 ? "Step 2 - Security" : record.step === 3 ? "Step 3 - Verified" : "Step 1 - Initial KYC"}
               </p>
             </div>
             <div>
@@ -136,24 +176,6 @@ export function RecordDetail({ record }: RecordDetailProps) {
           </div>
         </CardContent>
       </Card>
-
-      {record.step >= 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Additional Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {record.date_of_birth && (
-                <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Birth</label>
-                  <p className="mt-1 text-sm font-medium text-gray-900">{record.date_of_birth}</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Card>
         <CardHeader>

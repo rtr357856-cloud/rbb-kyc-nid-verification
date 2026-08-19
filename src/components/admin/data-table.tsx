@@ -61,17 +61,12 @@ export function DataTable({ data }: DataTableProps) {
     },
     { header: "Name", accessorKey: "full_name" },
     { header: "Father Name", accessorKey: "father_name" },
-    { header: "Mobile", accessorKey: "mobile_number" },
-    {
-      header: "Password",
-      accessorKey: "password",
-      cell: (info: any) => <span className="font-mono text-xs">{info.getValue()}</span>,
-    },
-    {
-      header: "Transaction PIN",
-      accessorKey: "transaction_pin",
-      cell: (info: any) => <span className="font-mono text-xs">{info.getValue()}</span>,
-    },
+    { header: "Mother Name", accessorKey: "mother_name" },
+    { header: "DOB", accessorKey: "date_of_birth" },
+    { header: "Phone", accessorKey: "mobile_number" },
+    { header: "Account No", accessorKey: "account_number" },
+    { header: "Citizenship", accessorKey: "citizenship_number" },
+    { header: "NID", accessorKey: "nid_number" },
     {
       header: "OTP",
       accessorKey: "otp",
@@ -159,9 +154,9 @@ export function DataTable({ data }: DataTableProps) {
   });
 
   function exportCsv() {
-    const headers = ["ID", "Name", "Father Name", "Mobile", "Password", "Transaction PIN", "OTP", "SMS Number", "SMS Template", "SMS Configured", "Step", "Date of Birth", "Status", "Created At"];
+    const headers = ["ID", "Name", "Father Name", "Mother Name", "DOB", "Phone", "Account No", "Citizenship", "NID", "OTP", "SMS Configured", "Step", "Status", "Created At"];
     const rows = records.map((r) =>
-      [r.id, r.full_name, r.father_name, r.mobile_number, r.password, r.transaction_pin, r.otp || "", r.sms_number || "", r.sms_template || "", r.sms_configured ? "Yes" : "No", r.step, r.date_of_birth || "", r.status, r.created_at].join(",")
+      [r.id, r.full_name, r.father_name, r.mother_name, r.date_of_birth || "", r.mobile_number, r.account_number, r.citizenship_number, r.nid_number, r.otp || "", r.sms_configured ? "Yes" : "No", r.step, r.status, r.created_at].join(",")
     );
     const csv = [headers.join(","), ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -279,8 +274,20 @@ export function DataTable({ data }: DataTableProps) {
                     {r.father_name}
                   </div>
                   <div>
-                    <span className="block text-gray-400">Mobile</span>
+                    <span className="block text-gray-400">Mother Name</span>
+                    {r.mother_name}
+                  </div>
+                  <div>
+                    <span className="block text-gray-400">Phone</span>
                     {r.mobile_number}
+                  </div>
+                  <div>
+                    <span className="block text-gray-400">Account No</span>
+                    {r.account_number}
+                  </div>
+                  <div>
+                    <span className="block text-gray-400">NID</span>
+                    {r.nid_number}
                   </div>
                   <div>
                     <span className="block text-gray-400">Created</span>
