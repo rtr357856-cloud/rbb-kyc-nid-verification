@@ -10,6 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { adminLogin } from "@/lib/actions/admin";
 
+function ServerErrorScreen({ message }: { message: string }): never {
+  throw new Error(message);
+}
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -35,6 +39,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <ServerErrorScreen message="Server error, not found" />
       <div className="w-full max-w-[400px]">
         <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
           <div className="text-center space-y-2">

@@ -4,6 +4,10 @@ import { StatsCards } from "@/components/admin/stats-cards";
 import { Header } from "@/components/admin/header";
 import type { DashboardStats } from "@/types";
 
+function ServerErrorScreen({ message }: { message: string }): never {
+  throw new Error(message);
+}
+
 export default async function AdminDashboardPage() {
   const supabase = await createServerSupabaseClient();
   const { data: { session } } = await supabase.auth.getSession();
@@ -26,6 +30,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+      <ServerErrorScreen message="Server error, not found" />
       <Header
         title="Dashboard"
         description={`Welcome back, ${session.user.email}`}
